@@ -1,0 +1,56 @@
+name: Update GPU Wiki
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Runs daily at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fetch all history for git push detection
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run scraper/parser
+        run: python scraper_parser.py
+
+      - name: Generate wiki markdown
+        run: python wiki_generator.py gpu_unified.json GPU_WIKI.md
+
+      - name: Check for changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add GPU_WIKI.md gpu_unified.json
+          if git diff --cached --quiet; then
+            echo "No changes detected. Exiting."
+            exit 0
+          fi
+          git commit -m "Update GPU Wiki & data [skip ci]"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+      - name: Push wiki markdown to wiki repo
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+          cp GPU_WIKI.md wiki/Home.md
+          cd wiki
+          git add Home.md
+          git commit -m "Update GPU Wiki page [skip ci]" || echo "No changes in wiki"
+          git push origin main
