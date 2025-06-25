@@ -1,0 +1,35 @@
+name: Daily GPU Data Scraper
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # runs daily at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4
+    - name: Run Nvidia scraper
+      run: python scraper/nvidia_scraper.py
+    - name: Run AMD scraper
+      run: python scraper/amd_scraper.py
+    - name: Run Intel scraper
+      run: python scraper/intel_scraper.py
+    - name: Commit and push changes
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git add data/*.json
+        git commit -m "Daily GPU data update" || echo "No changes to commit"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
