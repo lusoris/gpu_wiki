@@ -1,0 +1,21 @@
+[
+  {
+    "vendor": "amd",
+    "device_id": "73BF",
+    "device_name": "Radeon RX 7900 XTX",
+    "architecture": "RDNA 3",
+    "codename": "Navi 31",
+    "is_igpu": false,
+    "codecs": {
+      "encode": [
+        "H.264",
+        "HEVC"
+      ],
+      "decode": [
+        "H.264",
+        "HEVC",
+        "AV1"
+      ]
+    }
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "vendor": "intel",
+    "device_id": "56A0",
+    "device_name": "Arc A770",
+    "architecture": "Alchemist",
+    "codename": "DG2",
+    "is_igpu": false,
+    "codecs": {
+      "encode": [
+        "H.264",
+        "HEVC",
+        "AV1"
+      ],
+      "decode": [
+        "H.264",
+        "HEVC",
+        "AV1"
+      ]
+    }
+  }
+]
